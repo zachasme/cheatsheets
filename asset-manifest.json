@@ -1,13 +1,13 @@
 {
-  "main.css": "/cheatsheet/static/css/main.a34a2a68.chunk.css",
-  "main.js": "/cheatsheet/static/js/main.21f9d120.chunk.js",
-  "main.js.map": "/cheatsheet/static/js/main.21f9d120.chunk.js.map",
-  "static/js/1.f58f5f6a.chunk.js": "/cheatsheet/static/js/1.f58f5f6a.chunk.js",
-  "static/js/1.f58f5f6a.chunk.js.map": "/cheatsheet/static/js/1.f58f5f6a.chunk.js.map",
-  "runtime~main.js": "/cheatsheet/static/js/runtime~main.148713de.js",
-  "runtime~main.js.map": "/cheatsheet/static/js/runtime~main.148713de.js.map",
-  "static/css/main.a34a2a68.chunk.css.map": "/cheatsheet/static/css/main.a34a2a68.chunk.css.map",
-  "index.html": "/cheatsheet/index.html",
-  "precache-manifest.e24515a75577f0c2b3f7a3399c41441f.js": "/cheatsheet/precache-manifest.e24515a75577f0c2b3f7a3399c41441f.js",
-  "service-worker.js": "/cheatsheet/service-worker.js"
+  "main.css": "/cheatsheets/static/css/main.a34a2a68.chunk.css",
+  "main.js": "/cheatsheets/static/js/main.ed8568ab.chunk.js",
+  "main.js.map": "/cheatsheets/static/js/main.ed8568ab.chunk.js.map",
+  "static/js/1.f58f5f6a.chunk.js": "/cheatsheets/static/js/1.f58f5f6a.chunk.js",
+  "static/js/1.f58f5f6a.chunk.js.map": "/cheatsheets/static/js/1.f58f5f6a.chunk.js.map",
+  "runtime~main.js": "/cheatsheets/static/js/runtime~main.86c374d2.js",
+  "runtime~main.js.map": "/cheatsheets/static/js/runtime~main.86c374d2.js.map",
+  "static/css/main.a34a2a68.chunk.css.map": "/cheatsheets/static/css/main.a34a2a68.chunk.css.map",
+  "index.html": "/cheatsheets/index.html",
+  "precache-manifest.148eb0ca896e7e76ab64355660828f47.js": "/cheatsheets/precache-manifest.148eb0ca896e7e76ab64355660828f47.js",
+  "service-worker.js": "/cheatsheets/service-worker.js"
 }
