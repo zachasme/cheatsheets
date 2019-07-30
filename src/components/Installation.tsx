@@ -1,8 +1,17 @@
 import React from "react";
 
-import Input from "./Input.js";
+import Input from "./Input";
 
 const AURMAN_PGP = "465022E743D71E39";
+
+interface Props {
+  processor: any;
+  hostname: any;
+  username: any;
+  partition_device: any;
+  partition_efi: any;
+  partition_root: any;
+}
 
 export default ({
   processor,
@@ -11,7 +20,7 @@ export default ({
   partition_device,
   partition_efi,
   partition_root
-}) => (
+}: Props) => (
   <>
     <h3>Pre-installation (live environment)</h3>
     <ol>
@@ -54,7 +63,7 @@ export default ({
         /etc/pacman.d/mirrorlist
       </Input>
       <Input name="Install base packages">
-        pacstrap /mnt base base-devel {processor}-ucode
+        pacstrap /mnt base base‑devel {processor}‑ucode
       </Input>
     </ol>
     <h3>Configuration</h3>

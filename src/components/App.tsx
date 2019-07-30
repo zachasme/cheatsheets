@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import "./App.css";
 
-import Installation from "./Installation.js";
-import UserSpaceSetup from "./UserSpaceSetup.js";
+import Installation from "./Installation";
 
 const App = () => {
   const [processor, setProcessor] = useState("amd");
+  const [firmware, setFiremware] = useState("amd");
 
   const params = {
     username: useState("zach"),
@@ -15,7 +15,7 @@ const App = () => {
     partition_root: useState("/dev/sdX2")
   };
 
-  function handleProcessor(event) {
+  function handleProcessor(event: any) {
     setProcessor(event.target.value);
   }
 
@@ -56,7 +56,7 @@ const App = () => {
         <Installation
           processor={processor}
           {...Object.assign(
-            ...Object.entries(params).map(([name, [value]]) => ({
+            Object.entries(params).map(([name, [value]]) => ({
               [name]: value
             }))
           )}

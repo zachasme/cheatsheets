@@ -1,6 +1,12 @@
 import React from "react";
 
-export default ({ name, text, children }) => (
+interface Props {
+  name?: any;
+  text?: any;
+  children: any;
+}
+
+export default ({ name, text, children }: Props) => (
   <li className="Input">
     {name && <h5>{name}</h5>}
     <code>{children}</code>
