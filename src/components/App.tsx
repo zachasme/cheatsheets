@@ -3,9 +3,13 @@ import "./App.css";
 
 import Installation from "./Installation";
 
+import { Processor, Firmware } from "../types";
+
+import EnumRadio from "./EnumRadio";
+
 const App = () => {
-  const [processor, setProcessor] = useState("amd");
-  const [firmware, setFiremware] = useState("amd");
+  const [processor, setProcessor] = useState(Processor.AMD);
+  const [firmware, setFirmware] = useState(Firmware.UEFI);
 
   const params = {
     username: useState("zach"),
@@ -15,33 +19,29 @@ const App = () => {
     partition_root: useState("/dev/sdX2")
   };
 
-  function handleProcessor(event: any) {
-    setProcessor(event.target.value);
-  }
-
   return (
     <>
       <div className="controls" style={{ marginBottom: "2rem" }}>
-        <label>
-          <input
-            type="radio"
-            name="processor"
-            value="intel"
-            checked={processor === "intel"}
-            onChange={handleProcessor}
-          />{" "}
-          Intel
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="processor"
-            value="amd"
-            checked={processor === "amd"}
-            onChange={handleProcessor}
-          />{" "}
-          AMD
-        </label>
+        <ol>
+          <li>
+            <EnumRadio
+              name="firmware"
+              options={Firmware}
+              value={firmware}
+              onChange={setFirmware}
+            />
+          </li>
+          {firmware === Firmware.UEFI && (
+            <li>
+              <EnumRadio
+                name="processor"
+                options={Processor}
+                value={processor}
+                onChange={setProcessor}
+              />
+            </li>
+          )}
+        </ol>
         {Object.entries(params).map(([name, [value, setValue]]) => (
           <input
             key={name}
@@ -54,12 +54,13 @@ const App = () => {
       <h1>Installation cheatsheet</h1>
       <div className="App">
         <Installation
+          firmware={firmware}
           processor={processor}
-          {...Object.assign(
-            Object.entries(params).map(([name, [value]]) => ({
-              [name]: value
-            }))
-          )}
+          username={params["username"][0]}
+          hostname={params["hostname"][0]}
+          partition_device={params["partition_device"][0]}
+          partition_efi={params["partition_efi"][0]}
+          partition_root={params["partition_root"][0]}
         />
       </div>
     </>
