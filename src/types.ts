@@ -1,6 +1,6 @@
 export enum Firmware {
-  BIOS = "BIOS",
-  UEFI = "UEFI"
+  UEFI = "UEFI",
+  BIOS = "BIOS"
 }
 
 export enum Processor {

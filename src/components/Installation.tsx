@@ -11,9 +11,9 @@ interface Props {
   firmware: Firmware;
   hostname: any;
   username: any;
-  partition_device: any;
-  partition_efi: any;
-  partition_root: any;
+  partitionDevice: any;
+  partitionBoot: any;
+  partitionRoot: any;
 }
 
 export default ({
@@ -21,20 +21,25 @@ export default ({
   firmware,
   hostname,
   username,
-  partition_device,
-  partition_efi,
-  partition_root
+  partitionDevice,
+  partitionBoot,
+  partitionRoot
 }: Props) => {
   const isUEFI = firmware === Firmware.UEFI;
 
   const strapPackages = ["base", "base-devel"];
-  if (isUEFI) strapPackages.push(`${processor.toLowerCase()}‑ucode`);
+  const aurPackages = ["spotify"];
+
+  if (isUEFI) {
+    strapPackages.push(`${processor.toLowerCase()}‑ucode`);
+    aurPackages.push("systemd-boot-pacman-hook");
+  }
 
   return (
     <>
       <h3>Pre-installation (live environment)</h3>
       <ol>
-        <Input name="Set keyboard layout">loadkeys dk</Input>
+        <Input name={`Set keyboard layout`}>loadkeys dk</Input>
         {isUEFI && (
           <Input
             name="Verify EFI boot mode"
@@ -47,27 +52,27 @@ export default ({
         <Input name="Update system clock">timedatectl set-ntp true</Input>
         <Input
           name="Partition the disks"
-          text={`Example: ${partition_efi} EFI partition 550 MiB, ${partition_root} linux partition remaining space`}
+          text={`Example: ${partitionBoot} EFI partition 550 MiB, ${partitionRoot} linux partition remaining space`}
         >
-          gdisk {partition_device}
+          {isUEFI ? "gdisk" : "fdisk"} {partitionDevice}
         </Input>
         {isUEFI && (
           <Input name="Format EFI partition">
-            mkfs.fat -F32 {partition_efi}
+            mkfs.fat -F32 {partitionBoot}
           </Input>
         )}
         <Input
           name="Format root partition"
           text="Use whatever file system you wish"
         >
-          mkfs.btrfs {partition_root}
+          mkfs.btrfs {partitionRoot}
         </Input>
-        <Input name="Mount root file system">mount {partition_root} /mnt</Input>
+        <Input name="Mount root file system">mount {partitionRoot} /mnt</Input>
         {isUEFI && (
           <>
             <Input name="Create EFI mount point">mkdir /mnt/boot</Input>
             <Input name="Mount EFI file system">
-              mount {partition_efi} /mnt/boot
+              mount {partitionBoot} /mnt/boot
             </Input>
           </>
         )}
@@ -75,7 +80,7 @@ export default ({
       <h3>Installation</h3>
       <ol>
         <Input name="Install pacman tools">pacman -Syu pacman-contrib</Input>
-        <Input text="This monster fetches nearby mirrors, ranks them and persists them in config (which will also be copied over during the following command). It takes a while, grab a coffee.">
+        <Input text="This monster fetches nearby mirrors, ranks them and persists them in config (which will also be copied over during the following command). It takes a while, grab a coffee. If you dare, this is a shortened url: https://1n.pm/mirrorlist">
           curl -s
           "https://www.archlinux.org/mirrorlist/?country=DK&country=DE&country=NL&country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
           | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 5 - >
@@ -146,7 +151,7 @@ en_US.UTF-8 UTF-8`}
 linux /vmlinuz-linux
 initrd /${processor.toLowerCase()}-ucode.img
 initrd /initramfs-linux.img
-options root=${partition_root} rw`}
+options root=${partitionRoot} rw`}
               </code>
             </pre>
           </Input>
@@ -158,7 +163,7 @@ options root=${partition_root} rw`}
         <ol>
           <Input name="Install GRUB">pacman -Syu grub</Input>
           <Input name="Install bootloader">
-            grub install --target=i386-pc {partition_device}
+            grub install --target=i386-pc {partitionDevice}
           </Input>
           <Input name="Configure bootloader">
             grub-mkconfig -o /boot/grub/grub.cfg
@@ -193,8 +198,13 @@ options root=${partition_root} rw`}
       </ol>
       <h4>Install important AUR packages</h4>
       <ol>
-        <Input name="IMPORTANT: bootctl update hook">
-          aurman -Syu systemd-boot-pacman-hook
+        <Input
+          text={
+            isUEFI &&
+            "IMPORTANT: the bootctl update hook is needed to ensure microcode updates"
+          }
+        >
+          aurman -Syu {aurPackages.join(" ")}
         </Input>
       </ol>
       <h4>Install all the good shit</h4>

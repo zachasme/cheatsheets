@@ -1,70 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
+
+import { i18n } from "@lingui/core";
+import { I18nProvider } from "@lingui/react";
+
+import CheatSheet from "./CheatSheet";
 import "./App.css";
 
-import Installation from "./Installation";
+async function loadCatalog(locale: string) {
+  const catalog = await import(`@lingui/loader!../locales/${locale}.po`);
+  i18n.load(locale, catalog);
+}
 
-import { Processor, Firmware } from "../types";
+i18n.on("activate", loadCatalog);
+i18n.activate("en");
 
-import EnumRadio from "./EnumRadio";
-
-const App = () => {
-  const [processor, setProcessor] = useState(Processor.AMD);
-  const [firmware, setFirmware] = useState(Firmware.UEFI);
-
-  const params = {
-    username: useState("zach"),
-    hostname: useState("ballz-pc"),
-    partition_device: useState("/dev/sdX"),
-    partition_efi: useState("/dev/sdX1"),
-    partition_root: useState("/dev/sdX2")
-  };
-
+export default () => {
   return (
-    <>
-      <div className="controls" style={{ marginBottom: "2rem" }}>
-        <ol>
-          <li>
-            <EnumRadio
-              name="firmware"
-              options={Firmware}
-              value={firmware}
-              onChange={setFirmware}
-            />
-          </li>
-          {firmware === Firmware.UEFI && (
-            <li>
-              <EnumRadio
-                name="processor"
-                options={Processor}
-                value={processor}
-                onChange={setProcessor}
-              />
-            </li>
-          )}
-        </ol>
-        {Object.entries(params).map(([name, [value, setValue]]) => (
-          <input
-            key={name}
-            type="text"
-            value={value}
-            onChange={event => setValue(event.target.value)}
-          />
-        ))}
-      </div>
-      <h1>Installation cheatsheet</h1>
-      <div className="App">
-        <Installation
-          firmware={firmware}
-          processor={processor}
-          username={params["username"][0]}
-          hostname={params["hostname"][0]}
-          partition_device={params["partition_device"][0]}
-          partition_efi={params["partition_efi"][0]}
-          partition_root={params["partition_root"][0]}
-        />
-      </div>
-    </>
+    <I18nProvider i18n={i18n}>
+      <CheatSheet />
+    </I18nProvider>
   );
 };
-
-export default App;
