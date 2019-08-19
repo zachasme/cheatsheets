@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@lingui/react": "^3.0.0-7",
     "@types/jest": "24.0.16",
     "@types/node": "12.6.8",
     "@types/react": "16.8.23",
@@ -16,15 +15,13 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test"
+    "serve": "serve -s build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.2",
-    "@lingui/cli": "^3.0.0-7",
-    "@lingui/core": "^3.0.0-7",
-    "@lingui/loader": "^3.0.0-7",
-    "@lingui/macro": "^3.0.0-7",
-    "babel-core": "^7.0.0-bridge.0"
+    "gh-pages": "^2.1.1",
+    "serve": "^11.1.0"
   },
   "eslintConfig": {
     "extends": "react-app"

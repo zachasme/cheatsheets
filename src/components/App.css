@@ -33,7 +33,7 @@ li {
     rgba(0, 0, 0, 0.05) 0%,
     rgba(0, 0, 0, 0.045) 100%
   );
-  transform: translateX(0.5rem);
+  transform: translateX(0.4rem);
 }
 .Input .Input {
   margin-left: 2rem;
