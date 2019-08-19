@@ -23,6 +23,7 @@
     "gh-pages": "^2.1.1",
     "serve": "^11.1.0"
   },
+  "homepage": "https://zachasme.github.io/cheatsheets/",
   "eslintConfig": {
     "extends": "react-app"
   },
