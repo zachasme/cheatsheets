@@ -1,42 +1,27 @@
 {
-  "name": "my-app",
-  "version": "0.1.0",
-  "private": true,
+  "name": "svelte-app",
+  "version": "1.0.0",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.18.2",
+    "prettier-plugin-svelte": "^0.7.0",
+    "rollup": "^1.12.0",
+    "rollup-plugin-commonjs": "^10.0.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-livereload": "^1.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-svelte": "^5.0.3",
+    "rollup-plugin-terser": "^4.0.4",
+    "svelte": "^3.0.0"
+  },
   "dependencies": {
-    "@types/jest": "24.0.16",
-    "@types/node": "12.6.8",
-    "@types/react": "16.8.23",
-    "@types/react-dom": "16.8.5",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
-    "typescript": "3.5.3"
+    "sirv-cli": "^0.4.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "serve": "serve -s build",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
-  },
-  "devDependencies": {
-    "gh-pages": "^2.1.1",
-    "serve": "^11.1.0"
-  },
-  "homepage": "https://zachasme.github.io/cheatsheets/",
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "build": "rollup -c",
+    "autobuild": "rollup -c -w",
+    "dev": "run-p start:dev autobuild",
+    "start": "sirv public --single",
+    "start:dev": "sirv public --single --dev"
   }
 }
