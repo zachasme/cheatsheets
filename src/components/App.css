@@ -27,6 +27,9 @@ li {
   flex-wrap: wrap;
   transition: all 0.2s ease-out;
 }
+.Input.checked {
+  opacity: 0.5;
+}
 .Input:hover {
   background: linear-gradient(
     135deg,

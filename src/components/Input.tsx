@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
   name?: any;
@@ -6,10 +6,16 @@ interface Props {
   children: any;
 }
 
-export default ({ name, text, children }: Props) => (
-  <li className="Input">
-    {name && <h5>{name}</h5>}
-    <code>{children}</code>
-    {text && <p>{text}</p>}
-  </li>
-);
+export default ({ name, text, children }: Props) => {
+  const [checked, setChecked] = useState(false);
+  return (
+    <li
+      className={`Input ${checked && "checked"}`}
+      onClick={() => setChecked((checked) => !checked)}
+    >
+      {name && <h5>{name}</h5>}
+      <code>{children}</code>
+      {text && <p>{text}</p>}
+    </li>
+  );
+};

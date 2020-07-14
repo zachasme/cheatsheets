@@ -2,11 +2,14 @@ import React from "react";
 
 import Input from "./Input";
 
-import { Processor, Firmware } from "../types";
+import { Processor, Firmware, Editor, FileSystem, Kernel } from "../types";
 
 const AURMAN_PGP = "465022E743D71E39";
 
 interface Props {
+  editor: Editor;
+  kernel: Kernel;
+  fileSystem: FileSystem;
   processor: Processor;
   firmware: Firmware;
   hostname: any;
@@ -17,18 +20,22 @@ interface Props {
 }
 
 export default ({
+  editor,
+  kernel,
+  fileSystem,
   processor,
   firmware,
   hostname,
   username,
   partitionDevice,
   partitionBoot,
-  partitionRoot
+  partitionRoot,
 }: Props) => {
   const isUEFI = firmware === Firmware.UEFI;
 
-  const strapPackages = ["base", "base-devel"];
-  const aurPackages = ["spotify"];
+  const strapPackages = [kernel, editor, "base", "base-devel"];
+  const aurPackages = [];
+  const userPackages = ["xorg", "docker", "openssh", "termite"];
 
   if (isUEFI) {
     strapPackages.push(`${processor.toLowerCase()}‑ucode`);
@@ -52,20 +59,20 @@ export default ({
         <Input name="Update system clock">timedatectl set-ntp true</Input>
         <Input
           name="Partition the disks"
-          text={`Example: ${partitionBoot} EFI partition 550 MiB, ${partitionRoot} linux partition remaining space`}
+          text={`Example: ${partitionBoot} EFI partition 550 MiB, ${partitionRoot} ${kernel} partition remaining space`}
         >
           {isUEFI ? "gdisk" : "fdisk"} {partitionDevice}
         </Input>
         {isUEFI && (
-          <Input name="Format EFI partition">
+          <Input
+            name="Format EFI partition"
+            text="IMPORTANT: Refer to the wiki if you are dual booting, formatting your EFI partition will most likely make Windows unbootable"
+          >
             mkfs.fat -F32 {partitionBoot}
           </Input>
         )}
-        <Input
-          name="Format root partition"
-          text="Use whatever file system you wish"
-        >
-          mkfs.btrfs {partitionRoot}
+        <Input name="Format root partition">
+          mkfs.{fileSystem} {partitionRoot}
         </Input>
         <Input name="Mount root file system">mount {partitionRoot} /mnt</Input>
         {isUEFI && (
@@ -79,24 +86,29 @@ export default ({
       </ol>
       <h3>Installation</h3>
       <ol>
-        <Input name="Install pacman tools">pacman -Syu pacman-contrib</Input>
-        <Input text="This monster fetches nearby mirrors, ranks them and persists them in config (which will also be copied over during the following command). It takes a while, grab a coffee. If you dare, this is a shortened url: https://1n.pm/mirrorlist">
-          curl -s
-          "https://www.archlinux.org/mirrorlist/?country=DK&country=DE&country=NL&country=SE&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on"
-          | sed -e 's/^#Server/Server/' -e '/^#/d' | rankmirrors -n 5 - >
-          /etc/pacman.d/mirrorlist
+        <Input
+          name="Choose download mirrors"
+          text="The higher a mirror is placed in the list, the more priority it is given when downloading a package. You may want to edit the file accordingly, and move the geographically closest mirrors to the top of the list, although other criteria should be taken into account. This file will later be copied to the new system by pacstrap, so it is worth getting right. "
+        >
+          {editor} /etc/pacman.d/mirrorlist
         </Input>
-        <Input name="Install base packages">
+        <Input
+          name="Install base packages"
+          text="NOTE: If you are fucked, it might help to install linux-firmware"
+        >
           pacstrap /mnt {strapPackages.join(" ")}
         </Input>
       </ol>
       <h3>Configuration</h3>
       <ol>
         <Input name="Generate fstab file">
-          genfstab -U /mnt >> /mnt/etc/fstab
+          genfstab -U /mnt &gt;&gt; /mnt/etc/fstab
         </Input>
         <Input name="Change root into new system">arch-chroot /mnt</Input>
         <Input name="Set root password">passwd</Input>
+        <Input name="Set default editor">
+          echo 'EDITOR={editor}' &gt;&gt; /etc/environment
+        </Input>
       </ol>
       <h4>Localization</h4>
       <ol>
@@ -107,7 +119,7 @@ export default ({
           hwclock --systohc
         </Input>
         <Input name="Uncomment locales to generate">
-          nano /etc/locale.gen
+          {editor} /etc/locale.gen
           <pre>
             <code>
               {`en_DK.UTF-8 UTF-8
@@ -117,17 +129,17 @@ en_US.UTF-8 UTF-8`}
         </Input>
         <Input name="Generate locales">locale-gen</Input>
         <Input name="Set LANG">
-          echo 'LANG=en_DK.UTF-8' > /etc/locale.conf
+          echo 'LANG=en_DK.UTF-8' &gt; /etc/locale.conf
         </Input>
         <Input name="Persist keymap">
-          echo 'KEYMAP=dk' > /etc/vconsole.conf
+          echo 'KEYMAP=dk' &gt; /etc/vconsole.conf
         </Input>
       </ol>{" "}
       <h4>Networking</h4>
       <ol>
-        <Input name="Set hostname">echo '{hostname}' > /etc/hostname</Input>
+        <Input name="Set hostname">echo '{hostname}' &gt; /etc/hostname</Input>
         <Input name="Configure hosts file">
-          nano /etc/hosts
+          {editor} /etc/hosts
           <pre>
             <code>
               {`127.0.0.1\tlocalhost
@@ -144,13 +156,13 @@ en_US.UTF-8 UTF-8`}
             name="Configure bootloader"
             text="You can also edit /boot/loader/loader.conf to increase timeout if you are dual booting-windows (otherwise you will boot directly to linux)"
           >
-            nano /boot/loader/entries/arch.conf
+            {editor} /boot/loader/entries/arch.conf
             <pre>
               <code>
-                {`title Arch Linux
-linux /vmlinuz-linux
+                {`title Arch Linux (${kernel})
+linux /vmlinuz-${kernel}
 initrd /${processor.toLowerCase()}-ucode.img
-initrd /initramfs-linux.img
+initrd /initramfs-${kernel}.img
 options root=${partitionRoot} rw`}
               </code>
             </pre>
@@ -175,14 +187,19 @@ options root=${partitionRoot} rw`}
       )}
       <h3>Userspace setup</h3>
       <ol>
-        <Input
-          name="Create regular user"
-          text="wheel is for sudo, audio is for audio"
-        >
-          useradd --create-home --groups audio,wheel {username}
+        <Input name="Create regular user" text="The `wheel` group is for sudo">
+          useradd --create-home --groups wheel {username}
         </Input>
         <Input name="Set user password">passwd {username}</Input>
-        <Input name="Enable sudo for wheel group">visudo</Input>
+        <Input
+          name="Enable sudo for wheel group"
+          text="Uncomment the above to allow members of group `wheel` to execute any command (after entering root password)"
+        >
+          visudo
+          <pre>
+            <code>%wheel ALL=(ALL) ALL</code>
+          </pre>
+        </Input>
         <Input name="Change to regular user">su {username}</Input>
       </ol>
       <h4>Install aurman</h4>
@@ -196,22 +213,24 @@ options root=${partitionRoot} rw`}
         <Input>cd aurman</Input>
         <Input name="Compile and install">makepkg -si</Input>
       </ol>
-      <h4>Install important AUR packages</h4>
-      <ol>
-        <Input
-          text={
-            isUEFI &&
-            "IMPORTANT: the bootctl update hook is needed to ensure microcode updates"
-          }
-        >
-          aurman -Syu {aurPackages.join(" ")}
-        </Input>
-      </ol>
+      {aurPackages.length > 0 && (
+        <>
+          <h4>Install important AUR packages</h4>
+          <ol>
+            <Input
+              text={
+                isUEFI &&
+                "IMPORTANT: the bootctl update hook is needed to ensure microcode updates"
+              }
+            >
+              aurman -Syu {aurPackages.join(" ")}
+            </Input>
+          </ol>
+        </>
+      )}
       <h4>Install all the good shit</h4>
       <ol>
-        <Input>
-          sudo pacman -Syu docker docker-compose openssh termite unzip ...
-        </Input>
+        <Input>sudo pacman -Syu {userPackages.join(" ")} ...</Input>
       </ol>
     </>
   );
