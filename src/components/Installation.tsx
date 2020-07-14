@@ -153,6 +153,12 @@ en_US.UTF-8 UTF-8`}
         <ol>
           <Input name="Install bootloader">bootctl install</Input>
           <Input
+            name="Read UUID of root partition"
+            text="You will need this for the next step"
+          >
+            lsblk -dno UUID {partitionRoot}
+          </Input>
+          <Input
             name="Configure bootloader"
             text="You can also edit /boot/loader/loader.conf to increase timeout if you are dual booting-windows (otherwise you will boot directly to linux)"
           >
@@ -163,7 +169,7 @@ en_US.UTF-8 UTF-8`}
 linux /vmlinuz-${kernel}
 initrd /${processor.toLowerCase()}-ucode.img
 initrd /initramfs-${kernel}.img
-options root=${partitionRoot} rw`}
+options root="UUID=put-here-the-uuid-you-got-above" rw`}
               </code>
             </pre>
           </Input>
